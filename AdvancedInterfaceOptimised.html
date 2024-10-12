@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizMaster</title>
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    #root {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+    }
+    h1, h2 {
+      margin: 0 0 20px;
+    }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .quiz-list, .statistics {
+      margin-top: 20px;
+    }
+    .quiz-item, .stat-item {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    function App() {
+      const [isAuthenticated, setIsAuthenticated] = useState(false);
+      const [user, setUser] = useState(null);
+      const [quizzes, setQuizzes] = useState([]);
+      const [quizForm, setQuizForm] = useState({ title: '', questions: [] });
+      const [question, setQuestion] = useState('');
+
+      const [statistics, setStatistics] = useState([
+        { quizTitle: "Math Quiz", attempts: 10, score: "85%", progress: "Completed" },
+        { quizTitle: "Science Quiz", attempts: 5, score: "70%", progress: "In Progress" }
+      ]);
+
+      const handleLogin = () => {
+        setIsAuthenticated(true);
+        setUser({ name: "John Doe" });
+      };
+
+      const handleLogout = () => {
+        setIsAuthenticated(false);
+        setUser(null);
+      };
+
+      const handleAddQuiz = () => {
+        if (quizForm.title && question) {
+          const newQuiz = { ...quizForm, questions: [...quizForm.questions, question] };
+          setQuizzes([...quizzes, newQuiz]);
+          setQuizForm({ title: '', questions: [] });
+          setQuestion('');
+        }
+      };
+
+      return (
+        <div className="container">
+          <h1>QuizMaster</h1>
+
+          {!isAuthenticated ? (
+            <div>
+              <button onClick={handleLogin}>Login</button>
+              <button>Sign Up</button>
+            </div>
+          ) : (
+            <div>
+              <h2>Welcome, {user.name}!</h2>
+              <button onClick={handleLogout}>Logout</button>
+
+              <h2>Create a New Quiz</h2>
+              <input
+                type="text"
+                placeholder="Quiz Title"
+                value={quizForm.title}
+                onChange={(e) => setQuizForm({ ...quizForm, title: e.target.value })}
+              />
+              <input
+                type="text"
+                placeholder="Add a Question"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+              />
+              <button onClick={handleAddQuiz}>Add Quiz</button>
+
+              <div className="quiz-list">
+                <h2>Your Quizzes</h2>
+                {quizzes.length === 0 ? (
+                  <p>No quizzes yet</p>
+                ) : (
+                  quizzes.map((quiz, index) => (
+                    <div className="quiz-item" key={index}>
+                      <h3>{quiz.title}</h3>
+                      <ul>
+                        {quiz.questions.map((q, i) => (
+                          <li key={i}>{q}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="statistics">
+                <h2>Your Statistics</h2>
+                {statistics.length === 0 ? (
+                  <p>No statistics available</p>
+                ) : (
+                  statistics.map((stat, index) => (
+                    <div className="stat-item" key={index}>
+                      <h3>{stat.quizTitle}</h3>
+                      <p>Attempts: {stat.attempts}</p>
+                      <p>Score: {stat.score}</p>
+                      <p>Progress: {stat.progress}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
